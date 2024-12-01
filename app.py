@@ -13,11 +13,12 @@ app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # Habilitar SSL/TLS
-app.config['MYSQL_SSL_CA'] = './certs/cacert.pem'
+app.config['MYSQL_SSL_CA'] = 'C:/Users/acern/AppData/Local/Programs/Python/Python313/Lib/site-packages/certifi/cacert.pem'
+
 
 mysql = MySQL(app)
 
-@app.route('/test-db-connection', methods=['GET'])  # Nuevo endpoint para evitar conflicto
+@app.route('/test-db-connection', methods=['GET'])
 def test_db_connection():
     try:
         cur = mysql.connection.cursor()
@@ -25,7 +26,8 @@ def test_db_connection():
         db_name = cur.fetchone()
         return f"Conexión exitosa a la base de datos: {db_name['DATABASE()']}"
     except Exception as e:
-        return f"Error de conexión: {str(e)}"
+        return f"Error de conexión: {str(e)}<br>Verifica la configuración de SSL y las credenciales de PlanetScale."
+
 
 # Función para generar una barra de navegación con el color personalizado
 def generar_navbar():
