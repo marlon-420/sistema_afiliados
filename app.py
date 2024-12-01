@@ -5,44 +5,46 @@ import datetime
 app = Flask(__name__)
 
 # Configuración de la base de datos MySQL (PlanetScale)
-app.config['MYSQL_HOST'] = 'aws.connect.psdb.cloud'  # Host proporcionado por PlanetScale
-app.config['MYSQL_USER'] = 'aqtup814u7543vka5ljg'  # Usuario proporcionado por PlanetScale
-app.config['MYSQL_PASSWORD'] = 'ppscale_pw_3aQ2k0qF4KdiAf0e86ffKOmsz1zbfojMioKyXwFvwAX'  # Contraseña proporcionada por PlanetScale
-app.config['MYSQL_DB'] = 'sistema_afiliados'  # Nombre de la base de datos
-app.config['MYSQL_PORT'] = 3306  # Puerto estándar de MySQL
+app.config['MYSQL_HOST'] = 'aws.connect.psdb.cloud'
+app.config['MYSQL_USER'] = 'aqtup814u7543vka5ljg'
+app.config['MYSQL_PASSWORD'] = 'ppscale_pw_3aQ2k0qF4KdiAf0e86ffKOmsz1zbfojMioKyXwFvwAX'
+app.config['MYSQL_DB'] = 'sistema_afiliados'
+app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # Habilitar SSL/TLS
 app.config['MYSQL_SSL_CA'] = './certs/cacert.pem'
 
-  # Ruta del certificado SSL en Render
-
 mysql = MySQL(app)
+
+@app.route('/test-db-connection', methods=['GET'])  # Nuevo endpoint para evitar conflicto
+def test_db_connection():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT DATABASE();")
+        db_name = cur.fetchone()
+        return f"Conexión exitosa a la base de datos: {db_name['DATABASE()']}"
+    except Exception as e:
+        return f"Error de conexión: {str(e)}"
 
 # Función para generar una barra de navegación con el color personalizado
 def generar_navbar():
     return '''
-    <nav class="navbar" style="background-color: #eb7042; height: 80px; display: flex; justify-content: center; align-items: center;">
-        <a class="navbar-brand text-white" href="/" style="display: flex; align-items: center;">
-            <img src="/static/logo.png" alt="Logo" style="height: 60px; margin-right: 10px;">
-            <span style="font-size: 1.5rem;">Sistema de Afiliados</span>
-        </a>
-    </nav>
     <nav class="navbar navbar-expand-lg" style="background-color: #eb7042;">
         <div class="container-fluid">
+            <a class="navbar-brand text-white" href="/">Sistema de Afiliados</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link text-white" href="/formulario">Agregar Afiliado</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="/afiliados">Listar Afiliados</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="/avisos">Avisos</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/test-db">Test Conexión</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <div class="container mt-4">
     '''
 
 @app.route('/')
@@ -446,15 +448,6 @@ def avisos():
         return html
     except Exception as e:
         return f"<h1>Error: {str(e)}</h1>"
-
-try:
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT DATABASE()")
-    result = cur.fetchone()
-    print(f"Connected to database: {result}")
-except Exception as e:
-    print(f"Database connection error: {e}")
-
 
 
 if __name__ == '__main__':
