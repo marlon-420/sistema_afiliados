@@ -13,7 +13,7 @@ app.config['MYSQL_PORT'] = 3306  # Puerto estándar de MySQL
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # Habilitar SSL/TLS
-app.config['MYSQL_SSL_CA'] = '/etc/ssl/certs/ca-certificates.crt'
+app.config['MYSQL_SSL_CA'] = './certs/cacert.pem'
 
   # Ruta del certificado SSL en Render
 
@@ -446,6 +446,14 @@ def avisos():
         return html
     except Exception as e:
         return f"<h1>Error: {str(e)}</h1>"
+
+try:
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT DATABASE()")
+    result = cur.fetchone()
+    print(f"Connected to database: {result}")
+except Exception as e:
+    print(f"Database connection error: {e}")
 
 
 
