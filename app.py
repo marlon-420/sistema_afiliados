@@ -19,16 +19,6 @@ app.config['MYSQL_SSL_CA'] = '/etc/ssl/certs/ca-certificates.crt'  # Ruta del ce
 
 mysql = MySQL(app)
 
-@app.route('/test-db-connection', methods=['GET'])
-def test_db_connection():
-    try:
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT DATABASE();")
-        db_name = cur.fetchone()
-        return f"Conexión exitosa a la base de datos: {db_name['DATABASE()']}"
-    except Exception as e:
-        return f"Error de conexión: {str(e)}<br>Verifica la configuración de SSL y las credenciales de PlanetScale."
-
 
 # Función para generar una barra de navegación con el color personalizado
 def generar_navbar():
@@ -451,6 +441,17 @@ def avisos():
         return html
     except Exception as e:
         return f"<h1>Error: {str(e)}</h1>"
+
+@app.route('/test-ssl', methods=['GET'])
+def test_ssl_connection():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT DATABASE();")
+        db_name = cur.fetchone()
+        return f"Conexión exitosa a la base de datos: {db_name['DATABASE()']}"
+    except Exception as e:
+        return f"Error de conexión: {str(e)}"
+
 
 
 if __name__ == '__main__':
