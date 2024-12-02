@@ -13,7 +13,7 @@ app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # Habilitar SSL/TLS
-app.config['MYSQL_SSL_CA'] = 'C:/Users/acern/AppData/Local/Programs/Python/Python313/Lib/site-packages/certifi/cacert.pem'
+app.config['MYSQL_SSL_CA'] = '/etc/ssl/certs/ca-certificates.crt'
 
 
 mysql = MySQL(app)
