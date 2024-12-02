@@ -6,14 +6,15 @@ app = Flask(__name__)
 
 # Configuración de la base de datos MySQL (PlanetScale)
 app.config['MYSQL_HOST'] = 'aws.connect.psdb.cloud'
-app.config['MYSQL_USER'] = 'aqtup814u7543vka5ljg'
-app.config['MYSQL_PASSWORD'] = 'ppscale_pw_3aQ2k0qF4KdiAf0e86ffKOmsz1zbfojMioKyXwFvwAX'
+app.config['MYSQL_USER'] = 'aqtup814u7543vka5ljg'  # Reemplaza con tu usuario de PlanetScale
+app.config['MYSQL_PASSWORD'] = 'ppscale_pw_3aQ2k0qF4KdiAf0e86ffKOmsz1zbfojMioKyXwFvwAX'  # Reemplaza con tu contraseña
 app.config['MYSQL_DB'] = 'sistema_afiliados'
 app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-# Habilitar SSL/TLS
-app.config['MYSQL_SSL_CA'] = '/etc/ssl/certs/ca-certificates.crt'
+# Configuración de SSL
+app.config['MYSQL_SSL_CA'] = '/etc/ssl/certs/ca-certificates.crt'  # Ruta del certificado SSL
+
 
 
 mysql = MySQL(app)
