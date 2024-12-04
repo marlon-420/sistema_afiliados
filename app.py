@@ -17,33 +17,20 @@ from config import Config
 
 try:
     # Intentar la conexión
-    connection = pymysql.connect(
-        host=Config.MYSQL_HOST,  
-        user=Config.MYSQL_USER,  
-        password=Config.MYSQL_PASSWORD,  
-        database=Config.MYSQL_DB,  
+    db = pymysql.connect(
+        host=Config.MYSQL_HOST,
+        user=Config.MYSQL_USER,
+        password=Config.MYSQL_PASSWORD,
+        database=Config.MYSQL_DB,
         ssl={
-            "ca": Config.MYSQL_SSL_CA
+            "ca": Config.MYSQL_SSL_CA  # Ruta al certificado SSL
         }
     )
+    db.autocommit(True)  # Activar autocommit explícitamente
     print("Conexión exitosa a la base de datos.")
-
-    # Ejecutar un query para listar tablas
-    with connection.cursor() as cursor:
-        cursor.execute("SHOW TABLES")
-        tables = cursor.fetchall()
-        if tables:
-            print("Tablas en la base de datos:")
-            for table in tables:
-                print(f"- {table[0]}")
-        else:
-            print("No se encontraron tablas en la base de datos.")
-except Exception as e:
+except pymysql.MySQLError as e:
     print(f"Error al conectar a la base de datos: {e}")
-finally:
-    if 'connection' in locals() and connection.open:
-        connection.close()
-        print("Conexión cerrada.")
+    db = None
 
 
 
