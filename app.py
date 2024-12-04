@@ -16,22 +16,19 @@ import pymysql
 from config import Config
 
 try:
-    # Intentar la conexión
     db = pymysql.connect(
         host=Config.MYSQL_HOST,
         user=Config.MYSQL_USER,
         password=Config.MYSQL_PASSWORD,
         database=Config.MYSQL_DB,
         ssl={
-            "ca": Config.MYSQL_SSL_CA  # Ruta al certificado SSL
+            "ca": Config.MYSQL_SSL_CA
         }
     )
-    db.autocommit(True)  # Activar autocommit explícitamente
     print("Conexión exitosa a la base de datos.")
 except pymysql.MySQLError as e:
     print(f"Error al conectar a la base de datos: {e}")
     db = None
-
 
 
 # Ruta principal
