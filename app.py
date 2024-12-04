@@ -5,6 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from config import Config
 
+
 # Cargar variables del .env
 load_dotenv()
 
@@ -12,23 +13,18 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configuración de conexión a la base de datos
-import pymysql
-from config import Config  # Asegúrate de que Config está correctamente configurado
-
 try:
     db = pymysql.connect(
-        host=Config.MYSQL_HOST,  # Esto debería ser 'aws.connect.psdb.cloud'
+        host=Config.MYSQL_HOST,
         user=Config.MYSQL_USER,
         password=Config.MYSQL_PASSWORD,
         database=Config.MYSQL_DB,
-        ssl={"ca": Config.MYSQL_SSL_CA}  # Ruta al certificado SSL
+        ssl={"ca": Config.MYSQL_SSL_CA}
     )
     print("Conexión exitosa a la base de datos.")
-try:
-    # Código para interactuar con la base de datos
 except pymysql.MySQLError as e:
-    app.logger.error(f"Error al interactuar con la base de datos: {str(e)}")
-    return f"<h1>Error al interactuar con la base de datos: {str(e)}</h1>"
+    print(f"Error al conectar a la base de datos: {e}")
+    db = None
 
 # Ruta principal
 @app.route('/')
@@ -48,36 +44,24 @@ def test_connection():
     except pymysql.MySQLError as e:
         return f"Error al conectar a la base de datos: {str(e)}"
 
-
 # Ruta para listar afiliados
 @app.route('/afiliados', methods=['GET'])
 def listar_afiliados():
+    if db is None or not db.open:
+        return "Error: No se pudo establecer conexión a la base de datos."
     try:
         with db.cursor() as cur:
             cur.execute("SELECT * FROM Afiliados")
             afiliados = cur.fetchall()
         return render_template('listar_afiliados.html', afiliados=afiliados)
     except pymysql.MySQLError as e:
-    return f"<h1>Error al interactuar con la base de datos: {str(e)}</h1>"
-
-#ruta pruebaa
-@app.route('/check_db', methods=['GET'])
-def check_db():
-    try:
-        # Intenta conectar y ejecutar una consulta simple
-        with db.cursor() as cursor:
-            cursor.execute("SELECT DATABASE();")
-            db_name = cursor.fetchone()
-        return f"Conexión exitosa a la base de datos: {db_name[0]}"
-    except Exception as e:
-        return f"Error al conectar a la base de datos: {str(e)}"
-
+        return f"<h1>Error al listar afiliados: {str(e)}</h1>"
 
 # Ruta para registrar una venta
-from forms import VentaForm
-
 @app.route('/registrar_venta/<int:afiliado_id>', methods=['GET', 'POST'])
 def registrar_venta(afiliado_id):
+    if db is None or not db.open:
+        return "Error: No se pudo establecer conexión a la base de datos."
     form = VentaForm(request.form)
     if request.method == 'POST' and form.validate():
         modelo = form.modelo.data
@@ -93,7 +77,8 @@ def registrar_venta(afiliado_id):
                 db.commit()
             return redirect(url_for('listar_afiliados'))
         except pymysql.MySQLError as e:
-    return f"<h1>Error al interactuar con la base de datos: {str(e)}</h1>"
+            return f"<h1>Error al registrar venta: {str(e)}</h1>"
+    return render_template('registrar_venta.html', form=form, afiliado_id=afiliado_id)
 
 # Ruta para eliminar un afiliado
 @app.route('/eliminar_afiliado/<int:id>', methods=['GET'])
