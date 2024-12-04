@@ -22,11 +22,11 @@ try:
         user=Config.MYSQL_USER,
         password=Config.MYSQL_PASSWORD,
         database=Config.MYSQL_DB,
-        autocommit=True,
         ssl={
-    "ca": "C:/Users/acern/SistemaAfiliados/certs/cacert.pem"
-}
+            "ca": Config.MYSQL_SSL_CA  # Usar ruta del archivo configurada en Config
+        }
     )
+    db.autocommit(True)  # Activar autocommit explícitamente
     print("Conexión exitosa a la base de datos.")
 except pymysql.MySQLError as e:
     print(f"Error al conectar a la base de datos: {e}")
