@@ -18,14 +18,13 @@ from config import Config
 try:
     # Intentar la conexión
     connection = pymysql.connect(
-        host=DATABASE_HOST,
-        user=DATABASE_USERNAME,
-        password=DATABASE_PASSWORD,
-        database=DATABASE,
+        host=Config.MYSQL_HOST,  
+        user=Config.MYSQL_USER,  
+        password=Config.MYSQL_PASSWORD,  
+        database=Config.MYSQL_DB,  
         ssl={
-    "ca": "C:/Users/acern/SistemaAfiliados/certs/cacert.pem"
-}
-
+            "ca": Config.MYSQL_SSL_CA
+        }
     )
     print("Conexión exitosa a la base de datos.")
 
@@ -45,6 +44,8 @@ finally:
     if 'connection' in locals() and connection.open:
         connection.close()
         print("Conexión cerrada.")
+
+
 
 # Ruta principal
 @app.route('/')
