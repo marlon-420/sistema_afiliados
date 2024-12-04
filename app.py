@@ -18,12 +18,12 @@ from config import Config
 try:
     # Configuración de conexión
     db = pymysql.connect(
-        host=Config.MYSQL_HOST,
-        user=Config.MYSQL_USER,
-        password=Config.MYSQL_PASSWORD,
-        database=Config.MYSQL_DB,
+        host=Config.MYSQL_HOST,  # Debe coincidir con el host de PlanetScale
+        user=Config.MYSQL_USER,  # Usuario proporcionado por PlanetScale
+        password=Config.MYSQL_PASSWORD,  # Contraseña de PlanetScale
+        database=Config.MYSQL_DB,  # Nombre de la base de datos
         ssl={
-            "ca": Config.MYSQL_SSL_CA  # Usar ruta del archivo configurada en Config
+            "ca": Config.MYSQL_SSL_CA  # Usar la ruta configurada en Render
         }
     )
     db.autocommit(True)  # Activar autocommit explícitamente
@@ -31,7 +31,6 @@ try:
 except pymysql.MySQLError as e:
     print(f"Error al conectar a la base de datos: {e}")
     db = None
-
 
 # Ruta principal
 @app.route('/')
