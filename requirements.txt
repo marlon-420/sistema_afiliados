@@ -2,4 +2,4 @@ Flask
 pymysql
 python-dotenv
 gunicorn
-
+Flask-WTF
