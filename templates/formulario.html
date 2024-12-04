@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Formulario{% endblock %}
+
+{% block content %}
+<h1>Formulario</h1>
+<form method="POST" action="/registrar_venta">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    
+    <label for="estatus">Estatus:</label>
+    <select id="estatus" name="estatus" required>
+        <option value="Cliente">Cliente</option>
+        <option value="Vendedora">Vendedora</option>
+    </select>
+    
+    <button type="submit">Enviar</button>
+</form>
+{% endblock %}

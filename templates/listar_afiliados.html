@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Lista de Afiliados{% endblock %}
+{% block content %}
+<h1>Lista de Afiliados</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Estatus</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for afiliado in afiliados %}
+        <tr>
+            <td>{{ afiliado[0] }}</td>
+            <td>{{ afiliado[1] }}</td>
+            <td>{{ afiliado[2] }}</td>
+            <td>
+                <a href="/editar_afiliado/{{ afiliado[0] }}">Editar</a>
+                <a href="/eliminar_afiliado/{{ afiliado[0] }}">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

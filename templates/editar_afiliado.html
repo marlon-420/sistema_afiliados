@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Afiliado{% endblock %}
+
+{% block content %}
+<h1>Editar Afiliado</h1>
+<form method="POST">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" value="{{ afiliado[1] }}" required>
+    
+    <label for="estatus">Estatus:</label>
+    <select id="estatus" name="estatus" required>
+        <option value="Cliente" {% if afiliado[2] == 'Cliente' %}selected{% endif %}>Cliente</option>
+        <option value="Vendedora" {% if afiliado[2] == 'Vendedora' %}selected{% endif %}>Vendedora</option>
+    </select>
+    
+    <button type="submit">Actualizar</button>
+</form>
+{% endblock %}

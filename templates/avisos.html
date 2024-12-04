@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Avisos{% endblock %}
+
+{% block content %}
+<h1>Avisos</h1>
+
+<h2>Clientes con compras atrasadas</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Última Compra</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente[0] }}</td>
+            <td>{{ cliente[1] }}</td>
+            <td>{{ cliente[2] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Vendedoras con fechas próximas</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Primera Compra</th>
+            <th>Días Restantes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vendedora in vendedoras %}
+        <tr>
+            <td>{{ vendedora[0] }}</td>
+            <td>{{ vendedora[1] }}</td>
+            <td>{{ vendedora[2] }}</td>
+            <td>{{ vendedora[3] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
