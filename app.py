@@ -11,7 +11,8 @@ if os.getenv("FLASK_ENV") != "production":
     load_dotenv()
 
 # Configuración de Flask
-app = Flask(_name_)
+app = Flask(__name__)
+
 app.config.from_object(Config)  # Cargar configuración desde el objeto Config
 
 # Configuración de la conexión a la base de datos
