@@ -13,23 +13,20 @@ app = Flask(__name__)
 
 # Configuración de conexión a la base de datos
 import pymysql
-from config import Config
+from config import Config  # Asegúrate de que Config está correctamente configurado
 
 try:
     db = pymysql.connect(
-        host=Config.MYSQL_HOST,
+        host=Config.MYSQL_HOST,  # Esto debería ser 'aws.connect.psdb.cloud'
         user=Config.MYSQL_USER,
         password=Config.MYSQL_PASSWORD,
         database=Config.MYSQL_DB,
-        ssl={
-            "ca": Config.MYSQL_SSL_CA
-        }
+        ssl={"ca": Config.MYSQL_SSL_CA}  # Ruta al certificado SSL
     )
     print("Conexión exitosa a la base de datos.")
 except pymysql.MySQLError as e:
     print(f"Error al conectar a la base de datos: {e}")
     db = None
-
 
 # Ruta principal
 @app.route('/')
