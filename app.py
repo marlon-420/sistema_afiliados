@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import pymysql
 from datetime import datetime
 from dotenv import load_dotenv
+from config import Config
 
 # Cargar variables del .env
 load_dotenv()
@@ -11,18 +12,23 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configuración de conexión a la base de datos
+import pymysql
+
 try:
     db = pymysql.connect(
-        host=os.getenv("DATABASE_HOST"),
-        user=os.getenv("DATABASE_USERNAME"),
-        password=os.getenv("DATABASE_PASSWORD"),
-        database=os.getenv("DATABASE"),
-        ssl={"ca": "/etc/ssl/certs/ca-certificates.crt"}  # Ajusta si usas otro certificado en Render
+        host=Config.MYSQL_HOST,
+        user=Config.MYSQL_USER,
+        password=Config.MYSQL_PASSWORD,
+        database=Config.MYSQL_DB,
+        ssl={
+            'ca': Config.MYSQL_SSL_CA
+        }
     )
     print("Conexión exitosa a la base de datos")
-except pymysql.MySQLError as e:
+except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
     db = None
+
 
 # Ruta principal
 @app.route('/')
@@ -32,11 +38,13 @@ def home():
 # Probar conexión a la base de datos
 @app.route('/test_connection', methods=['GET'])
 def test_connection():
+    if db is None:
+        return "Error: No se pudo establecer conexión a la base de datos."
     try:
         with db.cursor() as cur:
-            cur.execute("SHOW TABLES;")
-            tables = cur.fetchall()
-            return f"Tablas en la base de datos: {tables}"
+            cur.execute("SELECT DATABASE();")
+            db_name = cur.fetchone()
+            return f"Conexión exitosa. Base de datos: {db_name[0]}"
     except Exception as e:
         return f"Error al conectar a la base de datos: {str(e)}"
 
