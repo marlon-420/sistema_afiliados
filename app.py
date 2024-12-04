@@ -16,21 +16,35 @@ import pymysql
 from config import Config
 
 try:
-    # Configuración de conexión
-    db = pymysql.connect(
-        host=Config.MYSQL_HOST,  # Debe coincidir con el host de PlanetScale
-        user=Config.MYSQL_USER,  # Usuario proporcionado por PlanetScale
-        password=Config.MYSQL_PASSWORD,  # Contraseña de PlanetScale
-        database=Config.MYSQL_DB,  # Nombre de la base de datos
+    # Intentar la conexión
+    connection = pymysql.connect(
+        host=DATABASE_HOST,
+        user=DATABASE_USERNAME,
+        password=DATABASE_PASSWORD,
+        database=DATABASE,
         ssl={
-            "ca": Config.MYSQL_SSL_CA  # Usar la ruta configurada en Render
-        }
+    "ca": "C:/Users/acern/SistemaAfiliados/certs/cacert.pem"
+}
+
     )
-    db.autocommit(True)  # Activar autocommit explícitamente
     print("Conexión exitosa a la base de datos.")
-except pymysql.MySQLError as e:
+
+    # Ejecutar un query para listar tablas
+    with connection.cursor() as cursor:
+        cursor.execute("SHOW TABLES")
+        tables = cursor.fetchall()
+        if tables:
+            print("Tablas en la base de datos:")
+            for table in tables:
+                print(f"- {table[0]}")
+        else:
+            print("No se encontraron tablas en la base de datos.")
+except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
-    db = None
+finally:
+    if 'connection' in locals() and connection.open:
+        connection.close()
+        print("Conexión cerrada.")
 
 # Ruta principal
 @app.route('/')
