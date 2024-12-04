@@ -24,9 +24,11 @@ try:
         ssl={"ca": Config.MYSQL_SSL_CA}  # Ruta al certificado SSL
     )
     print("Conexión exitosa a la base de datos.")
+try:
+    # Código para interactuar con la base de datos
 except pymysql.MySQLError as e:
-    print(f"Error al conectar a la base de datos: {e}")
-    db = None
+    app.logger.error(f"Error al interactuar con la base de datos: {str(e)}")
+    return f"<h1>Error al interactuar con la base de datos: {str(e)}</h1>"
 
 # Ruta principal
 @app.route('/')
@@ -36,33 +38,34 @@ def home():
 # Probar conexión a la base de datos
 @app.route('/test_connection', methods=['GET'])
 def test_connection():
-    if db is None:
+    if db is None or not db.open:
         return "Error: No se pudo establecer conexión a la base de datos."
     try:
         with db.cursor() as cur:
             cur.execute("SELECT DATABASE();")
             db_name = cur.fetchone()
             return f"Conexión exitosa. Base de datos: {db_name[0]}"
-    except Exception as e:
+    except pymysql.MySQLError as e:
         return f"Error al conectar a la base de datos: {str(e)}"
+
 
 # Ruta para listar afiliados
 @app.route('/afiliados', methods=['GET'])
 def listar_afiliados():
     try:
-        with connection.cursor() as cur:
+        with db.cursor() as cur:
             cur.execute("SELECT * FROM Afiliados")
             afiliados = cur.fetchall()
         return render_template('listar_afiliados.html', afiliados=afiliados)
-    except MySQLdb.Error as e:
-        return f"<h1>Error al listar afiliados: {str(e)}</h1>"
+    except pymysql.MySQLError as e:
+    return f"<h1>Error al interactuar con la base de datos: {str(e)}</h1>"
 
 #ruta pruebaa
 @app.route('/check_db', methods=['GET'])
 def check_db():
     try:
         # Intenta conectar y ejecutar una consulta simple
-        with connection.cursor() as cursor:
+        with db.cursor() as cursor:
             cursor.execute("SELECT DATABASE();")
             db_name = cursor.fetchone()
         return f"Conexión exitosa a la base de datos: {db_name[0]}"
@@ -82,26 +85,25 @@ def registrar_venta(afiliado_id):
         fecha = form.fecha.data or datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         try:
-            with connection.cursor() as cur:
+            with db.cursor() as cur:
                 cur.execute("""
                     INSERT INTO Ventas (AfiliadoID, Modelo, Talla, Fecha)
                     VALUES (%s, %s, %s, %s)
                 """, (afiliado_id, modelo, talla, fecha))
-                connection.commit()
+                db.commit()
             return redirect(url_for('listar_afiliados'))
-        except MySQLdb.Error as e:
-            return f"<h1>Error al registrar venta: {str(e)}</h1>"
-    return render_template('registrar_venta.html', form=form, afiliado_id=afiliado_id)
+        except pymysql.MySQLError as e:
+    return f"<h1>Error al interactuar con la base de datos: {str(e)}</h1>"
 
 # Ruta para eliminar un afiliado
 @app.route('/eliminar_afiliado/<int:id>', methods=['GET'])
 def eliminar_afiliado(id):
     try:
-        with connection.cursor() as cur:
+        with db.cursor() as cur:
             cur.execute("DELETE FROM Afiliados WHERE ID = %s", (id,))
-            connection.commit()
+            db.commit()
         return redirect(url_for('listar_afiliados'))
-    except MySQLdb.Error as e:
+    except pymysql.MySQLError as e:
         return f"<h1>Error al eliminar afiliado: {str(e)}</h1>"
 
 # Ruta para editar un afiliado
@@ -115,30 +117,30 @@ def editar_afiliado(id):
             return "<h1>Error: Todos los campos son obligatorios</h1>"
 
         try:
-            with connection.cursor() as cur:
+            with db.cursor() as cur:
                 cur.execute("""
                     UPDATE Afiliados
                     SET Nombre = %s, Estatus = %s
                     WHERE ID = %s
                 """, (nombre, estatus, id))
-                connection.commit()
+                db.commit()
             return redirect(url_for('listar_afiliados'))
-        except MySQLdb.Error as e:
+        except pymysql.MySQLError as e:
             return f"<h1>Error al editar afiliado: {str(e)}</h1>"
 
     try:
-        with connection.cursor() as cur:
+        with db.cursor() as cur:
             cur.execute("SELECT * FROM Afiliados WHERE ID = %s", (id,))
             afiliado = cur.fetchone()
         return render_template('editar_afiliado.html', afiliado=afiliado)
-    except MySQLdb.Error as e:
+    except pymysql.MySQLError as e:
         return f"<h1>Error al obtener afiliado: {str(e)}</h1>"
 
 # Ruta para avisos
 @app.route('/avisos', methods=['GET'])
 def avisos():
     try:
-        with connection.cursor() as cur:
+        with db.cursor() as cur:
             cur.execute("""
                 SELECT A.ID, A.Nombre, MAX(V.Fecha) AS UltimaCompra
                 FROM Afiliados A
@@ -160,7 +162,7 @@ def avisos():
             """)
             vendedoras_avisos = cur.fetchall()
         return render_template('avisos.html', clientes=clientes_avisos, vendedoras=vendedoras_avisos)
-    except MySQLdb.Error as e:
+    except pymysql.MySQLError as e:
         return f"<h1>Error al obtener avisos: {str(e)}</h1>"
 
 if __name__ == '__main__':
