@@ -157,6 +157,17 @@ def avisos():
     except pymysql.MySQLError as e:
         return f"<h1>Error al obtener avisos: {str(e)}</h1>"
 
+@app.route('/test_db_render', methods=['GET'])
+def test_db_render():
+    try:
+        with db.cursor() as cur:
+            cur.execute("SELECT DATABASE();")
+            db_name = cur.fetchone()
+            return f"Conexión exitosa a la base de datos desde Render: {db_name[0]}"
+    except Exception as e:
+        return f"Error al conectar desde Render: {str(e)}"
+
+
 # Habilitar depuración
 if __name__ == '__main__':
     app.run(debug=True)
