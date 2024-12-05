@@ -34,15 +34,16 @@ def home():
 # Probar conexión a la base de datos
 @app.route('/test_connection', methods=['GET'])
 def test_connection():
-    if db is None or not db.open:
-        return "Error: No se pudo establecer conexión a la base de datos."
     try:
+        # Intenta ejecutar un comando básico para verificar la conexión
         with db.cursor() as cur:
+            cur.execute("SELECT 1")  # Comando simple que siempre debería funcionar
             cur.execute("SELECT DATABASE();")
             db_name = cur.fetchone()
             return f"Conexión exitosa. Base de datos: {db_name[0]}"
     except pymysql.MySQLError as e:
         return f"Error al conectar a la base de datos: {str(e)}"
+
 
 # Ruta para listar afiliados
 @app.route('/afiliados', methods=['GET'])

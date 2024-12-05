@@ -5,5 +5,6 @@ class Config:
     MYSQL_USER = os.getenv("DATABASE_USERNAME")
     MYSQL_PASSWORD = os.getenv("DATABASE_PASSWORD")
     MYSQL_DB = os.getenv("DATABASE")
-    MYSQL_SSL_CA = os.getenv("MYSQL_SSL_CA", "/etc/ssl/certs/ca-certificates.crt")
+    MYSQL_SSL_CA = os.getenv("MYSQL_SSL_CA")
+
 
