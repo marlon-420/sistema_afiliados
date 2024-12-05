@@ -14,15 +14,16 @@ app = Flask(__name__)
 
 # Configuración de conexión a la base de datos
 try:
-    db = pymysql.connect(
+    db = MySQLdb.connect(
         host=Config.MYSQL_HOST,
         user=Config.MYSQL_USER,
-        password=Config.MYSQL_PASSWORD,
-        database=Config.MYSQL_DB,
+        passwd=Config.MYSQL_PASSWORD,
+        db=Config.MYSQL_DB,
+        ssl_mode="VERIFY_IDENTITY",
         ssl={"ca": Config.MYSQL_SSL_CA}
     )
     print("Conexión exitosa a la base de datos.")
-except pymysql.MySQLError as e:
+except MySQLdb.Error as e:
     print(f"Error al conectar a la base de datos: {e}")
     db = None
 
