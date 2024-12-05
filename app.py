@@ -3,20 +3,10 @@ from flask import Flask, render_template, request, redirect, url_for
 import pymysql
 from datetime import datetime
 from dotenv import load_dotenv
+from config import Config
 
 # Cargar variables del .env
 load_dotenv()
-
-# Configuración dinámica para rutas de SSL
-SSL_CA_PATH = "C:/Users/acern/SistemaAfiliados/certs/cacert.pem" if os.name == "nt" else "/etc/secrets/cacert.pem"
-
-# Clase de configuración
-class Config:
-    MYSQL_HOST = os.getenv("DATABASE_HOST")
-    MYSQL_USER = os.getenv("DATABASE_USERNAME")
-    MYSQL_PASSWORD = os.getenv("DATABASE_PASSWORD")
-    MYSQL_DB = os.getenv("DATABASE")
-    MYSQL_SSL_CA = SSL_CA_PATH
 
 # Configuración de Flask
 app = Flask(__name__)
@@ -32,7 +22,10 @@ try:
     )
     print("Conexión exitosa a la base de datos.")
 except pymysql.MySQLError as e:
-    print(f"Error al conectar a la base de datos: {e}")
+    print("Error al conectar a la base de datos.")
+    print(f"Código de error: {e.args[0]}")  # Código del error
+    print(f"Mensaje de error: {e.args[1]}")  # Mensaje detallado del error
+    app.logger.error(f"Error al conectar a la base de datos: {e.args[0]} - {e.args[1]}")  # Registro del error en el log
     db = None
 
 # Ruta principal
@@ -46,13 +39,16 @@ def test_connection():
     if db is None or not db.open:
         return "Error: No se pudo establecer conexión a la base de datos."
     try:
-        # Intenta ejecutar un comando básico para verificar la conexión
         with db.cursor() as cur:
             cur.execute("SELECT DATABASE();")
             db_name = cur.fetchone()
             return f"Conexión exitosa. Base de datos: {db_name[0]}"
     except pymysql.MySQLError as e:
+        app.logger.error(f"Error al conectar a la base de datos: {e.args[0]} - {e.args[1]}")
         return f"Error al conectar a la base de datos: {str(e)}"
+
+
+
 
 
 # Ruta para listar afiliados
@@ -161,5 +157,6 @@ def avisos():
     except pymysql.MySQLError as e:
         return f"<h1>Error al obtener avisos: {str(e)}</h1>"
 
+# Habilitar depuración
 if __name__ == '__main__':
     app.run(debug=True)
