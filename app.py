@@ -3,27 +3,35 @@ from flask import Flask, render_template, request, redirect, url_for
 import pymysql
 from datetime import datetime
 from dotenv import load_dotenv
-from config import Config
-
 
 # Cargar variables del .env
 load_dotenv()
+
+# Configuración dinámica para rutas de SSL
+SSL_CA_PATH = "C:/Users/acern/SistemaAfiliados/certs/cacert.pem" if os.name == "nt" else "/etc/secrets/cacert.pem"
+
+# Clase de configuración
+class Config:
+    MYSQL_HOST = os.getenv("DATABASE_HOST")
+    MYSQL_USER = os.getenv("DATABASE_USERNAME")
+    MYSQL_PASSWORD = os.getenv("DATABASE_PASSWORD")
+    MYSQL_DB = os.getenv("DATABASE")
+    MYSQL_SSL_CA = SSL_CA_PATH
 
 # Configuración de Flask
 app = Flask(__name__)
 
 # Configuración de conexión a la base de datos
 try:
-    db = MySQLdb.connect(
+    db = pymysql.connect(
         host=Config.MYSQL_HOST,
         user=Config.MYSQL_USER,
-        passwd=Config.MYSQL_PASSWORD,
-        db=Config.MYSQL_DB,
-        ssl_mode="VERIFY_IDENTITY",
+        password=Config.MYSQL_PASSWORD,
+        database=Config.MYSQL_DB,
         ssl={"ca": Config.MYSQL_SSL_CA}
     )
     print("Conexión exitosa a la base de datos.")
-except MySQLdb.Error as e:
+except pymysql.MySQLError as e:
     print(f"Error al conectar a la base de datos: {e}")
     db = None
 
@@ -35,10 +43,11 @@ def home():
 # Probar conexión a la base de datos
 @app.route('/test_connection', methods=['GET'])
 def test_connection():
+    if db is None or not db.open:
+        return "Error: No se pudo establecer conexión a la base de datos."
     try:
         # Intenta ejecutar un comando básico para verificar la conexión
         with db.cursor() as cur:
-            cur.execute("SELECT 1")  # Comando simple que siempre debería funcionar
             cur.execute("SELECT DATABASE();")
             db_name = cur.fetchone()
             return f"Conexión exitosa. Base de datos: {db_name[0]}"

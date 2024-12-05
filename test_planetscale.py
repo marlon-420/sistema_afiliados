@@ -14,7 +14,7 @@ try:
         db=os.getenv("DATABASE"),
         autocommit=True,
         ssl_mode="VERIFY_IDENTITY",
-        ssl={"ca": "/etc/ssl/certs/ca-certificates.crt"}
+        ssl={"ca": "C:/Users/acern/SistemaAfiliados/certs/cacert.pem"}  # Ruta correcta en Windows
     )
     print("Conexión exitosa a la base de datos.")
 
