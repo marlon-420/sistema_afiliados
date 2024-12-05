@@ -23,10 +23,10 @@ try:
     print("Conexión exitosa a la base de datos.")
 except pymysql.MySQLError as e:
     print("Error al conectar a la base de datos.")
-    print(f"Código de error: {e.args[0]}")  # Código del error
-    print(f"Mensaje de error: {e.args[1]}")  # Mensaje detallado del error
-    app.logger.error(f"Error al conectar a la base de datos: {e.args[0]} - {e.args[1]}")  # Registro del error en el log
+    print(f"Código de error: {e.args[0]}")
+    print(f"Mensaje de error: {e.args[1]}")
     db = None
+
 
 # Ruta principal
 @app.route('/')
